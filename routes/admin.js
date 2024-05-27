@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/add-service", adminController.addService)
 router.delete("/delete-service/:serviceID",adminController.deleteService)
-router.patch*('/edit-service/:serviceID', adminController.editService)
+router.patch('/edit-service/:serviceID', adminController.editService)
 
 // /admin/add-product => GET
 // router.get('/add-product', adminController.getAddProduct);
