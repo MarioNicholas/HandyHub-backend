@@ -8,6 +8,8 @@ const User = require("./models/user");
 
 const app = express();
 
+const port = process.env.PORT || 8000
+
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
@@ -43,7 +45,7 @@ mongoose
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then((result) => {
-    app.listen(8000);
+    app.listen(port, "0.0.0.0");
   })
   .catch((err) => {
     if (!err.statusCode) {
