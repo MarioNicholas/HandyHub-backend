@@ -5,7 +5,7 @@ const { BSONType } = require("mongodb");
 const Category = require("../models/category");
 const Order = require("../models/order");
 const Service = require("../models/service");
-const User = require("../models/user")
+const User = require("../models/user");
 
 exports.getCategory = (req, res, next) => {
   Category.find()
@@ -18,6 +18,26 @@ exports.getCategory = (req, res, next) => {
       }
       next(err);
     });
+};
+
+exports.getProfile = async (req, res, next) => {
+  const userId = req.userId;
+  try {
+    const user = await User.findById(userId);
+    const userProfile = {
+      name: user.name,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      username: user.username,
+      address: user.address,
+    };
+    res.status(200).json({ user: userProfile });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
 exports.getServices = (req, res, next) => {
@@ -34,6 +54,22 @@ exports.getServices = (req, res, next) => {
       next(err);
     });
 };
+
+exports.getServicesByCategory = async (req,res,next) => {
+  const categoryName = req.params.categoryName;
+  try {
+    const category = await Category.findOne({name: categoryName}).exec();
+    console.log(category);
+    const categoryId = category._id;
+    const services = await Service.find({category : categoryId}).populate("provider").exec();
+    res.status(200).json({services: services});
+  }catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
+}
 
 exports.getServiceByID = (req, res, next) => {
   const serviceID = req.params.serviceID;
@@ -67,21 +103,23 @@ exports.getOrderById = (req, res, next) => {
     });
 };
 
-exports.getFavorites = async (req,res,next) => {
+exports.getFavorites = async (req, res, next) => {
   const userId = req.userId;
   try {
     const user = await User.findById(userId).populate("favorite");
     const favoriteService = user.favorite;
-    res.status(200).json({message: message, favoriteService: favoriteService})
+    res
+      .status(200)
+      .json({ message: message, favoriteService: favoriteService });
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
     }
     next(error);
   }
-}
+};
 
-exports.postFavorites = async  (req,res,next) => {
+exports.postFavorites = async (req, res, next) => {
   const userId = req.userId;
   const serviceId = req.params.serviceID;
 
@@ -90,30 +128,30 @@ exports.postFavorites = async  (req,res,next) => {
     const service = await User.findById(serviceId);
     user.favorite.push(service);
     await user.save();
-    res.status(201).json({message: "Service added to favorite"});
+    res.status(201).json({ message: "Service added to favorite" });
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
     }
     next(error);
   }
-}
+};
 
-exports.deleteFavorite = async (req,res,next) => {
+exports.deleteFavorite = async (req, res, next) => {
   const userId = req.userId;
   const serviceID = req.params.serviceID;
   try {
     const user = await User.findById(userId);
-    user.favorite.pull(serviceID)
+    user.favorite.pull(serviceID);
     await user.save();
-    res.status(200).json({message: "Removed from favorite"})
+    res.status(200).json({ message: "Removed from favorite" });
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
     }
     next(error);
   }
-}
+};
 
 // exports.orderService = (req,res,next) => {
 //   const userId = req.userId;
@@ -124,7 +162,6 @@ exports.deleteFavorite = async (req,res,next) => {
 
 //   }
 // }
-
 
 // exports.getProducts = (req, res, next) => {
 //   Product.find()

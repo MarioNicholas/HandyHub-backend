@@ -17,6 +17,7 @@ exports.signup = (req, res, next) => {
   const email = req.body.email;
   const phoneNumber = req.body.phoneNumber;
   const address = req.body.address;
+  const favorite = [];
 
   bcrypt
     .hash(password, 12)
@@ -28,6 +29,7 @@ exports.signup = (req, res, next) => {
         password: hashedPassword,
         phoneNumber: phoneNumber,
         address: address,
+        favorite: favorite,
       });
       return user.save();
     })
@@ -59,7 +61,6 @@ exports.login = (req, res, next) => {
       return bcrypt.compare(password, user.password);
     })
     .then((isEqual) => {
-      console.log("hi")
       if (!isEqual) {
         const error = new Error("Wrong password");
         const statusCode = 401;
