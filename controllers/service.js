@@ -257,7 +257,7 @@ exports.orderService = (req, res, next) => {
 exports.finishOrder = (req, res, next) => {
   const userId = req.userId;
   const orderId = req.params.orderId;
-  const status = "Completed";
+  const newStatus = "Completed";
   Order.findOne({ _id: orderId, userId: userId })
     .then((order) => {
       if (!order) {
@@ -272,8 +272,11 @@ exports.finishOrder = (req, res, next) => {
         throw error;
       }
 
-      return Order.findOneAndUpdate(orderId, {status:status}, { new: true });
-    })
+      order.status = newStatus;
+      return order.save();
+      // return Order.findOneAndUpdate(orderId, {status:status}, { new: true });
+      // return Order.findOneAndUpdate(orderId, {status:status}, { new: true });
+      })
     .then(() => {
       res.status(200).json({ message: "Order Completed" });
     })
