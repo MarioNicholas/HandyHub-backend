@@ -4,13 +4,6 @@ const expressValidator = require("express-validator");
 const jwt = require("jsonwebtoken");
 
 exports.signup = (req, res, next) => {
-  const errors = expressValidator.validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Validation failed");
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
-  }
   const name = req.body.name;
   const username = req.body.username;
   const password = req.body.password;
@@ -19,30 +12,43 @@ exports.signup = (req, res, next) => {
   const address = req.body.address;
   const favorite = [];
 
-  let imagePath;
-
-  if (req.file) {
-    imagePath = req.file.filename
-  }
-
-  bcrypt
-    .hash(password, 12)
-    .then((hashedPassword) => {
-      const user = new User({
-        name: name,
-        username: username,
-        email: email,
-        password: hashedPassword,
-        phoneNumber: phoneNumber,
-        address: address,
-        favorite: favorite,
-        image: imagePath
-      });
-      return user.save();
-    })
-    .then((result) => {
-      res.status(201).json({ message: "User Created", userId: result._id });
-    })
+  User.findOne({username: username}).then((user) => {
+    if (user) {
+      const error = new Error("Username Existed, pick another username");
+      error.statusCode = 422;
+      throw error
+    } else {
+      let imagePath;
+    
+      if (req.file) {
+        imagePath = req.file.filename
+      }
+    
+      bcrypt
+        .hash(password, 12)
+        .then((hashedPassword) => {
+          const user = new User({
+            name: name,
+            username: username,
+            email: email,
+            password: hashedPassword,
+            phoneNumber: phoneNumber,
+            address: address,
+            favorite: favorite,
+            image: imagePath
+          });
+          return user.save();
+        })
+        .then((result) => {
+          res.status(201).json({ message: "User Created", userId: result._id });
+        }).catch((err) => {
+          if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+        });
+    }
+  })
     .catch((err) => {
       if (!err.statusCode) {
         err.statusCode = 500;
