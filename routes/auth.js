@@ -11,7 +11,7 @@ const router = express.Router();
 router.put(
   "/signup",
   [
-    expressValidator.body("username").notEmpty().withMessage("Cannot be empty").custom((value, { req }) => {
+    expressValidator.body("username").custom((value, { req }) => {
       return User.findOne({ username: value }).then((userDoc) => {
         if (userDoc) {
           return Promise.reject(
