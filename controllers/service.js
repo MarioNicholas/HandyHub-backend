@@ -146,6 +146,12 @@ exports.getOrderById = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      orders.sort((a, b) => {
+        if (a.status === 'scheduled' && b.status === 'completed') return -1;
+        if (a.status === 'completed' && b.status === 'scheduled') return 1;
+        return 0;
+      });
+      
       res.status(200).json({ orders: orders });
     })
     .catch((err) => {
