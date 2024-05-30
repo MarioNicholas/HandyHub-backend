@@ -20,11 +20,11 @@ router.put(
         }
       });
     }),
-    expressValidator.body("name").trim().notEmpty(),
-    expressValidator.body("address").trim().notEmpty(),
-    expressValidator.body("phoneNumber").trim().notEmpty(),
-    expressValidator.body("email").trim().notEmpty(),
-    expressValidator.body("password").trim().notEmpty(),
+    expressValidator.check("name").trim().notEmpty(),
+    expressValidator.check("address").trim().notEmpty(),
+    expressValidator.check("phoneNumber").trim().notEmpty(),
+    expressValidator.check("email").trim().notEmpty(),
+    expressValidator.check("password").trim().notEmpty(),
   ],
   fileUpload.single("image"),
   authContoller.signup

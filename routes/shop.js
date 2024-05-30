@@ -24,7 +24,7 @@ router.post("/favorite/:serviceID", isAuth, serviceController.postFavorites);
 router.delete("/favorite/:serviceID", isAuth, serviceController.deleteFavorite);
 
 router.post("/review/:serviceID", isAuth, [
-  expressValidator.body("rating").trim().notEmpty(),
+  expressValidator.check("rating").trim().notEmpty(),
 ], serviceController.addReview);
 router.get("/review/:serviceID", serviceController.getReview);
 router.delete("/review/:reviewID", isAuth, serviceController.deleteReview)
