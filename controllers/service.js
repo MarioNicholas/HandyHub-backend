@@ -7,6 +7,8 @@ const Order = require("../models/order");
 const Service = require("../models/service");
 const User = require("../models/user");
 const Review = require("../models/review");
+const expressValidator = require("express-validator");
+
 
 exports.getCategory = (req, res, next) => {
   Category.find()
@@ -292,7 +294,7 @@ exports.addReview = async (req,res,next) => {
     error.data = errors.array();
     throw error;
   }
-  
+
   const userId = req.userId;
   const serviceId = req.params.serviceID;
   const rating = req.body.rating;
