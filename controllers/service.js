@@ -293,7 +293,7 @@ exports.addReview = async (req,res,next) => {
     error.data = errors.array();
     throw error;
   }
-  
+
   const userId = req.userId;
   const serviceId = req.params.serviceID;
   const rating = req.body.rating;
