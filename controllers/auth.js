@@ -19,6 +19,12 @@ exports.signup = (req, res, next) => {
   const address = req.body.address;
   const favorite = [];
 
+  let imagePath;
+
+  if (req.file) {
+    imagePath = req.file.filename
+  }
+
   bcrypt
     .hash(password, 12)
     .then((hashedPassword) => {
@@ -30,6 +36,7 @@ exports.signup = (req, res, next) => {
         phoneNumber: phoneNumber,
         address: address,
         favorite: favorite,
+        image: imagePath
       });
       return user.save();
     })
@@ -74,7 +81,7 @@ exports.login = (req, res, next) => {
         "superdupersecret",
         { expiresIn: "1h" }
       );
-      res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+      res.status(200).json({ token: token, userId: loadedUser._id.toString(), name: loadedUser.name });
     })
     .catch((err) => {
       if (!err.statusCode) {
