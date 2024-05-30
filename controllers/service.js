@@ -58,6 +58,7 @@ exports.getServices = (req, res, next) => {
   Service.find()
     .populate("provider")
     .populate("category")
+    .limit(3)
     .then((services) => {
       if (!services) {
         const error = new Error("No Services Found");
