@@ -20,16 +20,18 @@ router.put(
         }
       });
     }),
-    expressValidator.body("name").trim().notEmpty(),
-    expressValidator.body("address").trim().notEmpty(),
-    expressValidator.body("phoneNumber").trim().notEmpty(),
-    expressValidator.body("email").trim().notEmpty(),
-    expressValidator.body("password").trim().notEmpty(),
+    // expressValidator.body("name").trim().notEmpty(),
+    // expressValidator.body("address").trim().notEmpty(),
+    // expressValidator.body("phoneNumber").trim().notEmpty(),
+    // expressValidator.body("email").trim().notEmpty(),
+    // expressValidator.body("password").trim().notEmpty(),
   ],
   fileUpload.single("image"),
   authContoller.signup
 );
 
-router.post("/login", [expressValidator.body("username").trim().notEmpty(), expressValidator.body("password").trim().notEmpty()],authContoller.login);
+router.post("/login", 
+// [expressValidator.body("username").trim().notEmpty(), expressValidator.body("password").trim().notEmpty()],
+authContoller.login);
 
 module.exports = router;

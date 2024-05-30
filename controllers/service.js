@@ -7,6 +7,7 @@ const Order = require("../models/order");
 const Service = require("../models/service");
 const User = require("../models/user");
 const Review = require("../models/review");
+const expressValidator = require("express-validator");
 
 exports.getCategory = (req, res, next) => {
   Category.find()
@@ -253,7 +254,7 @@ exports.orderService = (req, res, next) => {
     });
 };
 
-exports.finishOrder = (req, rest, next) => {
+exports.finishOrder = (req, res, next) => {
   const userId = req.userId;
   const orderId = req.params.orderId;
   const status = "Completed";
