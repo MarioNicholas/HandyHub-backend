@@ -18,6 +18,7 @@ router.get("/service/:serviceID", serviceController.getServiceByID);
 router.get("/services/:categoryName", serviceController.getServicesByCategory);
 router.post("/service/order", isAuth, serviceController.orderService);
 router.patch("/service/finish-order/:orderId",isAuth,serviceController.finishOrder);
+router.get("/provider-order",isAuth, serviceController.getProviderOrder);
 
 router.get("/favorite", isAuth, serviceController.getFavorites);
 router.post("/favorite/:serviceID", isAuth, serviceController.postFavorites);

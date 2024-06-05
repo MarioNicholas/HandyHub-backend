@@ -15,7 +15,7 @@ exports.getCategory = (req, res, next) => {
       if (!category) {
         const error = new Error("No Category Found");
         error.statusCode = 404;
-        throw error
+        throw error;
       }
       res.status(200).json({ category: category });
     })
@@ -34,7 +34,7 @@ exports.getProfile = async (req, res, next) => {
     if (!user) {
       const error = new Error("No User Found");
       error.statusCode = 404;
-      throw error
+      throw error;
     }
     const userProfile = {
       id: user._id.toString(),
@@ -43,7 +43,7 @@ exports.getProfile = async (req, res, next) => {
       email: user.email,
       username: user.username,
       address: user.address,
-      image: user.image
+      image: user.image,
     };
     res.status(200).json({ user: userProfile });
   } catch (err) {
@@ -67,9 +67,11 @@ exports.getServices = (req, res, next) => {
       }
       const modifiedService = services.map((service) => ({
         ...service._doc,
-        images: service.images.length > 0 ? [service.images[0]] : []
+        images: service.images.length > 0 ? [service.images[0]] : [],
       }));
-      res.status(200).json({ message: "Successful", services: modifiedService });
+      res
+        .status(200)
+        .json({ message: "Successful", services: modifiedService });
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -97,9 +99,9 @@ exports.getServicesByCategory = async (req, res, next) => {
       res.status(200).json({ message: "No Services", services: [] });
     }
     const modifiedService = services.map((service) => ({
-        ...service._doc,
-        images: service.images.length > 0 ? [service.images[0]] : []
-      }));
+      ...service._doc,
+      images: service.images.length > 0 ? [service.images[0]] : [],
+    }));
     res.status(200).json({ message: "Successful", services: modifiedService });
   } catch (error) {
     if (!error.statusCode) {
@@ -148,11 +150,11 @@ exports.getOrderById = (req, res, next) => {
         throw error;
       }
       orders.sort((a, b) => {
-        if (a.status === 'scheduled' && b.status === 'completed') return -1;
-        if (a.status === 'completed' && b.status === 'scheduled') return 1;
+        if (a.status === "scheduled" && b.status === "completed") return -1;
+        if (a.status === "completed" && b.status === "scheduled") return 1;
         return 0;
       });
-      
+
       res.status(200).json({ orders: orders });
     })
     .catch((err) => {
@@ -166,20 +168,20 @@ exports.getOrderById = (req, res, next) => {
 exports.getFavorites = async (req, res, next) => {
   const userId = req.userId;
   try {
-    const user = await User.findById(userId).populate({
-      path: 'favorite',
-      populate: {
-        path: 'provider',
-      }
-    }).exec();
+    const user = await User.findById(userId)
+      .populate({
+        path: "favorite",
+        populate: {
+          path: "provider",
+        },
+      })
+      .exec();
     if (!user) {
       const error = new Error("User not found");
       error.statusCode = 404;
       throw error;
     }
-    res
-      .status(200)
-      .json({ message: "Success", favorites: user.favorite });
+    res.status(200).json({ message: "Success", favorites: user.favorite });
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
@@ -283,7 +285,7 @@ exports.finishOrder = (req, res, next) => {
       return order.save();
       // return Order.findOneAndUpdate(orderId, {status:status}, { new: true });
       // return Order.findOneAndUpdate(orderId, {status:status}, { new: true });
-      })
+    })
     .then(() => {
       res.status(200).json({ message: "Order Completed" });
     })
@@ -295,7 +297,7 @@ exports.finishOrder = (req, res, next) => {
     });
 };
 
-exports.addReview = async (req,res,next) => {
+exports.addReview = async (req, res, next) => {
   const errors = expressValidator.validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed");
@@ -313,14 +315,14 @@ exports.addReview = async (req,res,next) => {
       userId: userId,
       serviceId: serviceId,
       rating: rating,
-      review: review
-    })
+      review: review,
+    });
     await newReview.save();
     const reviews = await Review.find({ serviceId: serviceId });
     const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-    const averageRating = (totalRating/reviews.length).toFixed(1);
+    const averageRating = (totalRating / reviews.length).toFixed(1);
     await Service.findByIdAndUpdate(serviceId, { rating: averageRating });
-    res.status(201).json({message: "Review added"}) 
+    res.status(201).json({ message: "Review added" });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -329,113 +331,119 @@ exports.addReview = async (req,res,next) => {
   }
 };
 
-exports.getReview = async (req,res,next) => {
+exports.getReview = async (req, res, next) => {
   const serviceID = req.params.serviceID;
   try {
-    const reviewDoc = await Review.find({serviceId: serviceID}).populate("userId").exec();
+    const reviewDoc = await Review.find({ serviceId: serviceID })
+      .populate("userId")
+      .exec();
     if (!reviewDoc) {
-      res.status(200).json({message: "Review Empty", review : []})
+      res.status(200).json({ message: "Review Empty", review: [] });
     }
-    const reviewData = reviewDoc.map((doc) => {return {
-      id: doc._id.toString(),
-      userId: doc.userId._id.toString(),
-      name: doc.userId.name,
-      review: doc.review,
-      rating: doc.rating
-    }});
-    res.status(200).json({review: reviewData, message: "Fetched"})
+    const reviewData = reviewDoc.map((doc) => {
+      return {
+        id: doc._id.toString(),
+        userId: doc.userId._id.toString(),
+        name: doc.userId.name,
+        review: doc.review,
+        rating: doc.rating,
+      };
+    });
+    res.status(200).json({ review: reviewData, message: "Fetched" });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
   }
-}
+};
 
-exports.deleteReview = (req,res,next) => {
+exports.deleteReview = (req, res, next) => {
   const reviewID = req.params.reviewID;
-  const userId = req.userId
+  const userId = req.userId;
   let serviceId;
 
   Review.findById(reviewID)
-  .then((review) => {
-    if (!review) {
-      const error = new Error("Review not found");
-      error.statusCode = 404;
-      throw error;
-    }
+    .then((review) => {
+      if (!review) {
+        const error = new Error("Review not found");
+        error.statusCode = 404;
+        throw error;
+      }
 
-    if (review.userId.toString() !== userId) {
-      const error = new Error ("You do not have access to this review")
+      if (review.userId.toString() !== userId) {
+        const error = new Error("You do not have access to this review");
         error.statusCode = 403;
         throw error;
-    }
-    serviceId = review.serviceId
-    return Review.findByIdAndDelete(reviewID);
-  })
-  .then((result) => {
-    return Review.find({serviceId:serviceId})
-  })
-  .then((remaining) => {
-    let averageRating = 0;
-    if (remaining.length > 0) {
-        const totalRatings = remaining.reduce((acc, review) => acc + review.rating, 0);
+      }
+      serviceId = review.serviceId;
+      return Review.findByIdAndDelete(reviewID);
+    })
+    .then((result) => {
+      return Review.find({ serviceId: serviceId });
+    })
+    .then((remaining) => {
+      let averageRating = 0;
+      if (remaining.length > 0) {
+        const totalRatings = remaining.reduce(
+          (acc, review) => acc + review.rating,
+          0
+        );
         averageRating = (totalRatings / remaining.length).toFixed(1); // Round to 1 decimal place
-        averageRating = parseFloat(averageRating); 
+        averageRating = parseFloat(averageRating);
       }
       return Service.findByIdAndUpdate(serviceId, { rating: averageRating });
-  })
-  .then((result) => {
-    res.status(201).json({message: "Review Deleted"})
-  })
-  .catch((err) => {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  });
+    })
+    .then((result) => {
+      res.status(201).json({ message: "Review Deleted" });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
-exports.getProviderOrder = (req,res,next) => {
+exports.getProviderOrder = (req, res, next) => {
   const userId = req.userId;
-  Service.find({provider:userId})
-  .then((services)=> {
-    if (!services) {
-      const error = new Error("You don't have any service");
-      error.statusCode = 404;
-      throw error;
-    }
-    const serviceIds = services.map(service => service._id);
+  Service.find({ provider: userId })
+    .then((services) => {
+      if (!services) {
+        const error = new Error("You don't have any service");
+        error.statusCode = 404;
+        throw error;
+      }
+      const serviceIds = services.map((service) => service._id);
 
-    return Order.find({serviceId: {$in : serviceIds}})
-    .populate({
-      path: "serviceId",
-      populate: {
-        path: "provider",
-      },
+      return Order.find({ serviceId: { $in: serviceIds } }).populate({
+        path: "serviceId",
+        populate: {
+          path: "provider",
+        },
+      });
+    })
+    .then((orders) => {
+      if (!orders || orders.length === 0) {
+        const error = new Error("Orders not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      orders.sort((a, b) => {
+        if (a.status === "scheduled" && b.status === "completed") return -1;
+        if (a.status === "completed" && b.status === "scheduled") return 1;
+        return 0;
+      });
+
+      res.status(200).json({ orders: orders });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     });
-})
-.then((orders) => {
-  if (!orders || orders.length === 0) {
-    const error = new Error("Orders not found");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  orders.sort((a, b) => {
-    if (a.status === 'scheduled' && b.status === 'completed') return -1;
-    if (a.status === 'completed' && b.status === 'scheduled') return 1;
-    return 0;
-  });
-
-  res.status(200).json({ orders: orders });
-})
-.catch((err) => {
-  if (!err.statusCode) {
-    err.statusCode = 500;
-  }
-  next(err);
-});
 };
 
 // exports.editService = (req, res, next) => {
