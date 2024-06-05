@@ -396,6 +396,48 @@ exports.deleteReview = (req,res,next) => {
   });
 };
 
+exports.getProviderOrder = (req,res,next) => {
+  const userId = req.userId;
+  Service.find({provider:userId})
+  .then((services)=> {
+    if (!services) {
+      const error = new Error("You don't have any service");
+      error.statusCode = 404;
+      throw error;
+    }
+    const serviceIds = services.map(service => service._id);
+
+    return Order.find({serviceId: {$in : serviceIds}})
+    .populate({
+      path: "serviceId",
+      populate: {
+        path: "provider",
+      },
+    });
+})
+.then((orders) => {
+  if (!orders || orders.length === 0) {
+    const error = new Error("Orders not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  orders.sort((a, b) => {
+    if (a.status === 'scheduled' && b.status === 'completed') return -1;
+    if (a.status === 'completed' && b.status === 'scheduled') return 1;
+    return 0;
+  });
+
+  res.status(200).json({ orders: orders });
+})
+.catch((err) => {
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  next(err);
+});
+};
+
 // exports.editService = (req, res, next) => {
 //   const {
 //     body,
