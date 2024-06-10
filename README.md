@@ -1,10 +1,9 @@
-### Tugas dibuat oleh kelompok 8:
+### Tugas dibuat oleh kelompok 5:
 | No.| Nama                          |  NIM     | 
 |:--:| :---------------------------: | :------: |
 | 1. | Mario Nicholas Reyhan         | 18221061 |
 | 2. | Nicolas Owen Halim            | 18221095 |
 | 3. | Ivan Leovandi                 | 18221129 |
-| 4. | Nicholas                      | 18221165 |
 
 ## Getting Started
 1. **Clone repository ini**
