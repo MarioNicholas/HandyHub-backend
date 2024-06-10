@@ -8,7 +8,7 @@
 ## Getting Started
 1. **Clone repository ini**
 ```
-git clone https://gitlab.informatika.org/tubes-rpl-kelompok-8/gymbro-management-system.git
+git clone https://github.com/MarioNicholas/HandyHub-backend.git
 ```
 2. **Install node modules**
 ```
@@ -17,9 +17,5 @@ npm install
 3. **Jalankan development server:**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+npm run start
 ```
